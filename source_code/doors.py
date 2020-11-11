@@ -1,36 +1,33 @@
 from source_code.door import Door
 from random import randrange
+import random
 
 class Doors:
     def __init__(self):
         self._doors=[]
         self._index_of_door_with_prize=''
-        self._index_of_door_user_selected=0
-        self._index_of_door_host_opened=''
+        self._index_of_door_user_selected=False
 
-    def set_up_doors(self, number_of_doors, prize):
-        self._index_of_door_with_prize = randrange(number_of_doors - 1)
-        no_of_doors_with_prizes=0
-        no_of_doors_without_prizes=0
-
+    def _line_up_doors(self, number_of_doors):
         for door_no in range(number_of_doors):
-            if door_no == self._index_of_door_with_prize:
-                self._doors.append(Door('car'))
-                no_of_doors_with_prizes += 1
-            else:
-                self._doors.append(Door('sheep'))
-                no_of_doors_without_prizes += 1
-        return (no_of_doors_with_prizes, no_of_doors_without_prizes)
+            self._doors.append(Door())
 
-    def open_door_without_prize(self):
-        for index, door in enumerate(self._doors):
-            if index == self._index_of_door_user_selected or door.get_object_behind_door()=='car':
-                continue
-            self._index_of_door_host_opened = index
-            return door
-
-    def has_user_found_prize(self):
-        if self._index_of_door_with_prize == self._index_of_door_user_selected:
-            return True
+    def _place_prize_behind_random_door(self, override_random_door=False):
+        if override_random_door:
+            self._index_of_door_with_prize = override_random_door
         else:
-            return False
+            self._index_of_door_with_prize=random.randint(0, len(self._doors)-1)
+
+    def _player_guessing_door_with_prize(self, override_random_door=False):
+        if override_random_door:
+            self._index_of_door_user_selected = override_random_door
+        else:
+            self._index_of_door_user_selected = random.randint(0, len(self._doors) - 1)
+
+    def setup(self, number_of_doors, override_prize_door_index=False, override_user_selection_index=False):
+        self._line_up_doors(number_of_doors)
+        self._place_prize_behind_random_door(override_prize_door_index)
+        self._player_guessing_door_with_prize(override_user_selection_index)
+
+    def is_user_selection_match_prize_location(self):
+        return self._index_of_door_with_prize == self._index_of_door_user_selected
