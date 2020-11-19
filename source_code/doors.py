@@ -5,29 +5,45 @@ import random
 class Doors:
     def __init__(self):
         self._doors=[]
-        self._index_of_door_with_prize=''
+        self._index_of_door_monty_opened=''
         self._index_of_door_user_selected=False
 
-    def _line_up_doors(self, number_of_doors):
-        for door_no in range(number_of_doors):
-            self._doors.append(Door())
+    def setup(self, number_of_doors, override_prize_door_index=False, override_user_selection_index=False):
+        door_index_with_prize = self._select_random_door_for_prize(number_of_doors, override_prize_door_index)
+        self._line_up_doors(number_of_doors, door_index_with_prize)
+        self._select_random_door_player_selected(override_user_selection_index)
+        self.get_monty_door()
 
-    def _place_prize_behind_random_door(self, override_random_door=False):
+    def _select_random_door_for_prize(self, number_of_doors, override_random_door=False):
         if override_random_door:
-            self._index_of_door_with_prize = override_random_door
+            return override_random_door
         else:
-            self._index_of_door_with_prize=random.randint(0, len(self._doors)-1)
+            return random.randint(1, number_of_doors)
 
-    def _player_guessing_door_with_prize(self, override_random_door=False):
+    def _line_up_doors(self, number_of_doors, door_index_with_prize):
+        for door_no in range(1,number_of_doors+1):
+            if door_no == door_index_with_prize:
+                self._doors.append(Door('car'))
+            else:
+                self._doors.append(Door())
+
+    def _select_random_door_player_selected(self, override_random_door=False):
         if override_random_door:
             self._index_of_door_user_selected = override_random_door
         else:
-            self._index_of_door_user_selected = random.randint(0, len(self._doors) - 1)
+            self._index_of_door_user_selected = random.randint(1, len(self._doors))
 
-    def setup(self, number_of_doors, override_prize_door_index=False, override_user_selection_index=False):
-        self._line_up_doors(number_of_doors)
-        self._place_prize_behind_random_door(override_prize_door_index)
-        self._player_guessing_door_with_prize(override_user_selection_index)
 
-    def is_user_selection_match_prize_location(self):
-        return self._index_of_door_with_prize == self._index_of_door_user_selected
+    def get_monty_door(self):
+        for door in range(1, len(self._doors)+1):
+            if door == self._index_of_door_user_selected or self._doors[door-1].get_object_behind_door()=='car':
+                continue
+            else:
+                self._index_of_door_monty_opened = door
+                return door
+
+    def has_user_won(self):
+        if self._doors[self._index_of_door_user_selected-1].get_object_behind_door()=='car':
+            return True
+        else:
+            return False
