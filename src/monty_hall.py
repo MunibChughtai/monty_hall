@@ -16,6 +16,6 @@ class MontyHall:
         
         print(f"""
               {number_of_simulations} simulations completed:
-                if user maintained initial selection they would have won {win_if_stay} times,
-                if user would have changed their initial selection they would have won {number_of_simulations - win_if_stay} times
+                if user maintained initial selection they would have won {win_if_stay} times or {round((win_if_stay / number_of_simulations)*100,2)}%,
+                if user would have changed their initial selection they would have won {number_of_simulations - win_if_stay} times or {round(((number_of_simulations - win_if_stay) / number_of_simulations)*100,2)}%
               """)
